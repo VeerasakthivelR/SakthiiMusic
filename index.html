@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SakthiiMusic</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SakthiiMusic">
+<meta name="theme-color" content="#140021">
+
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+
+<style>
+body{
+margin:0;
+min-height:100vh;
+min-height:100dvh;
+background:radial-gradient(circle at top,#2a003d,#140021);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Arial;
+display:flex;
+align-items:center;
+justify-content:center;
+color:#fff;
+}
+
+.app{width:100%;max-width:420px;padding:20px;}
+.card{
+background:rgba(0,0,0,.55);
+backdrop-filter:blur(14px);
+border-radius:24px;
+padding:32px 24px;
+box-shadow:0 24px 50px rgba(0,0,0,.45);
+}
+
+.screen{display:none;flex-direction:column;align-items:center;text-align:center;}
+.screen.active{display:flex}
+
+/* TEXT ANIMATION */
+.animate{
+opacity:0;
+transform:translateY(20px);
+transition:all .7s ease;
+}
+.animate.show{
+opacity:1;
+transform:translateY(0);
+}
+
+.title{
+font-size:22px;
+font-weight:600;
+margin-bottom:15px;
+}
+
+.btn{
+width:100%;
+max-width:320px;
+padding:14px;
+margin-top:12px;
+border:none;
+border-radius:14px;
+background:#ff4d6d;
+color:#fff;
+font-size:16px;
+opacity:0;
+transition:opacity .6s ease;
+}
+.btn.secondary{background:rgba(255,255,255,.12)}
+.btn.show{opacity:1}
+
+input{
+width:100%;
+max-width:320px;
+padding:14px;
+font-size:16px;
+border-radius:12px;
+border:none;
+text-align:center;
+margin-top:12px;
+}
+
+/* Playlist Buttons */
+.musicBtn{
+width:100%;
+max-width:320px;
+height:120px;
+margin-top:15px;
+border-radius:18px;
+border:none;
+font-size:18px;
+font-weight:bold;
+color:white;
+display:flex;
+align-items:end;
+justify-content:center;
+padding:10px;
+background:#ff4d6d;
+background-size:cover;
+background-position:center;
+background-blend-mode:darken;
+background-color:rgba(0,0,0,0.4);
+opacity:0;
+transition:opacity .6s ease;
+}
+.musicBtn.show{opacity:1}
+
+.playerImage{
+width:260px;
+height:260px;
+border-radius:20px;
+background-size:cover;
+background-position:center;
+margin-bottom:20px;
+}
+
+.timer{
+margin-top:15px;
+font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="song" src="kannekalaimaane.mp3"></audio>
+
+<div class="app">
+<div class="card">
+
+<!-- Welcome -->
+<div class="screen active" id="welcome">
+<div class="title animate">Welcome to SakthiiMusic 🎵</div>
+<div class="animate">Are you Pavii?</div>
+<button class="btn" onclick="go('passcode')">YES</button>
+<button class="btn secondary" onclick="go('denied')">NO</button>
+</div>
+
+<!-- Denied -->
+<div class="screen" id="denied">
+<div class="title animate">Access Denied</div>
+<div class="animate">Only Pavii can enter</div>
+<button class="btn" onclick="go('welcome')">Back</button>
+</div>
+
+<!-- Passcode -->
+<div class="screen" id="passcode">
+<div class="title animate">Enter Passcode</div>
+<input id="code" class="animate" placeholder="****">
+<button class="btn" onclick="verify()">VERIFY</button>
+<div id="error" style="color:#ff8fa3;margin-top:10px;"></div>
+</div>
+
+<!-- Playlist -->
+<div class="screen" id="playlist">
+<div class="title animate">Sakthii Own Voice Playlist 🎶</div>
+
+<button class="musicBtn"
+style="background-image:url('kannekalaimaane.jpg')"
+onclick="openPlayer()">
+Kanne Kalaimaane
+</button>
+
+<button class="musicBtn" onclick="comingSoon()">Coming Soon</button>
+<button class="musicBtn" onclick="comingSoon()">Coming Soon</button>
+<button class="musicBtn" onclick="comingSoon()">Coming Soon</button>
+<button class="musicBtn" onclick="comingSoon()">Coming Soon</button>
+
+</div>
+
+<!-- Player -->
+<div class="screen" id="player">
+<div class="playerImage"
+style="background-image:url('kannekalaimaane.jpg')">
+</div>
+
+<div class="timer">
+<span id="current">00:00</span> /
+<span id="duration">00:00</span>
+</div>
+
+<button class="btn secondary show" onclick="back()">Back</button>
+</div>
+
+</div>
+</div>
+
+<script>
+const song=document.getElementById("song");
+const current=document.getElementById("current");
+const duration=document.getElementById("duration");
+const codeInput=document.getElementById("code");
+const error=document.getElementById("error");
+
+/* Animation function */
+function animateScreen(screen){
+const anims=[...screen.querySelectorAll('.animate')];
+const buttons=[...screen.querySelectorAll('.btn, .musicBtn')];
+
+anims.forEach(a=>a.classList.remove('show'));
+buttons.forEach(b=>b.classList.remove('show'));
+
+anims.forEach((a,i)=>{
+setTimeout(()=>a.classList.add('show'), i*400);
+});
+
+setTimeout(()=>{
+buttons.forEach((b,i)=>{
+setTimeout(()=>b.classList.add('show'), i*150);
+});
+}, anims.length*400);
+}
+
+function go(id){
+document.querySelectorAll('.screen')
+.forEach(s=>s.classList.remove('active'));
+
+const screen=document.getElementById(id);
+screen.classList.add('active');
+animateScreen(screen);
+}
+
+function verify(){
+if(codeInput.value==="9536"){
+error.textContent="";
+go('playlist');
+}else{
+error.textContent="Wrong passcode";
+}
+}
+
+function openPlayer(){
+go('player');
+song.currentTime=0;
+song.play();
+}
+
+function back(){
+song.pause();
+go('playlist');
+}
+
+function comingSoon(){
+alert("Coming Soon 🎵");
+}
+
+song.addEventListener("loadedmetadata",()=>{
+duration.textContent=formatTime(song.duration);
+});
+
+song.addEventListener("timeupdate",()=>{
+current.textContent=formatTime(song.currentTime);
+});
+
+function formatTime(time){
+const min=Math.floor(time/60);
+const sec=Math.floor(time%60);
+return `${min}:${sec<10?'0'+sec:sec}`;
+}
+
+/* Start animation on load */
+animateScreen(document.getElementById('welcome'));
+</script>
+
+</body>
+</html>

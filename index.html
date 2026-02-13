@@ -192,6 +192,7 @@ const duration=document.getElementById("duration");
 const codeInput=document.getElementById("code");
 const error=document.getElementById("error");
 
+/* Animate text and buttons */
 function animateScreen(screen){
 const anims=[...screen.querySelectorAll('.animate')];
 const buttons=[...screen.querySelectorAll('.btn, .musicBtn')];
@@ -210,6 +211,7 @@ setTimeout(()=>b.classList.add('show'), i*150);
 }, anims.length*400);
 }
 
+/* Screen navigation */
 function go(id){
 document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
 const screen=document.getElementById(id);
@@ -217,6 +219,7 @@ screen.classList.add('active');
 animateScreen(screen);
 }
 
+/* Verify passcode */
 function verify(){
 if(codeInput.value==="9536"){
 error.textContent="";
@@ -226,44 +229,71 @@ error.textContent="Wrong passcode";
 }
 }
 
+/* Open player */
 function openPlayer(){
 go('player');
 song.currentTime=0;
 song.play();
 }
 
+/* Back from player */
 function back(){
 song.pause();
 go('playlist');
 }
 
+/* Coming soon alert */
 function comingSoon(){
 alert("Coming Soon 🎵");
 }
 
-/* IMPROVED EXIT (Works on iPhone) */
+/* IMPROVED EXIT SCREEN */
 function exitApp(){
 song.pause();
 song.currentTime=0;
 
 document.body.innerHTML = `
 <div style="
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100vh;
+height:100dvh;
+background:radial-gradient(circle at top,#2a003d,#140021);
 display:flex;
 align-items:center;
 justify-content:center;
-height:100vh;
-background:#140021;
+padding:20px;
+box-sizing:border-box;
+font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',Arial;
 color:white;
-font-family:-apple-system;
 text-align:center;
 ">
-<div>
-<h2>SakthiiMusic Closed</h2>
-<p>You can now close this app.</p>
+
+<div style="
+width:100%;
+max-width:400px;
+background:rgba(0,0,0,.55);
+backdrop-filter:blur(14px);
+border-radius:24px;
+padding:40px 25px;
+box-shadow:0 24px 50px rgba(0,0,0,.45);
+">
+
+<h2 style="margin:0 0 15px 0;font-weight:600;">
+SakthiiMusic Closed 🎵
+</h2>
+
+<p style="margin:0;font-size:16px;opacity:.85;">
+You can now close this app safely.
+</p>
+
 </div>
 </div>`;
 }
 
+/* Music timer */
 song.addEventListener("loadedmetadata",()=>{
 duration.textContent=formatTime(song.duration);
 });
@@ -278,6 +308,7 @@ const s=Math.floor(t%60);
 return `${m}:${s<10?'0'+s:s}`;
 }
 
+/* Start animation */
 animateScreen(document.getElementById('welcome'));
 </script>
 
